@@ -24,7 +24,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=30)
+        expire = datetime.utcnow() + timedelta(minutes=300)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET, algorithm="HS256")
     return encoded_jwt
@@ -49,3 +49,22 @@ async def verify_token(token: str) -> Optional[User]:
     except jwt.InvalidTokenError:
         logger.error("Invalid token")
         return None
+
+
+# async def verify_token(token: str):
+#     try:
+#         # Add your JWT secret key here
+#         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+#         user_data = payload.get("sub")
+#         if user_data is None:
+#             logger.error("Token payload does not contain user data")
+#             return None
+        
+#         # Convert payload to User object
+#         return User(**user_data)
+#     except jwt.ExpiredSignatureError:
+#         logger.error("Token has expired")
+#         return None
+#     except jwt.JWTError as e:
+#         logger.error(f"Failed to decode token: {str(e)}")
+#         return None

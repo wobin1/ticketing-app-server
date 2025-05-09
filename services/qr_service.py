@@ -4,7 +4,7 @@ from io import BytesIO
 from config import settings
 import os
 
-async def generate_qrCode(ticket_id: str) -> str:
+async def generate_qr_code(ticket_id: str) -> str:
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(ticket_id)
     qr.make(fit=True)

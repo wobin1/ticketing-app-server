@@ -4,7 +4,7 @@ from repositories.event_repository import EventRepository
 from repositories.user_repository import UserRepository
 from schemas.ticket import Ticket, TicketPurchase, TicketVerification
 from schemas.user import User, UserCreate
-from services.qr_service import generate_qrCode
+from services.qr_service import generate_qr_code
 from services.email_service import send_ticket_email
 from services.auth_service import create_user
 import uuid
@@ -29,7 +29,7 @@ async def purchase_tickets(purchase: TicketPurchase, current_user: User) -> list
         
         for attendee in item.attendees:
             ticket_id = str(uuid.uuid4())
-            qrCode = await generate_qrCode(ticket_id)
+            qr_code = await generate_qr_code(ticket_id)
             
             ticket = {
                 "id": ticket_id,
@@ -38,7 +38,7 @@ async def purchase_tickets(purchase: TicketPurchase, current_user: User) -> list
                 "ticket_type_id": item.ticket_type_id,
                 "purchase_date": datetime.now(timezone.utc),
                 "status": "active",
-                "qrCode": qrCode,
+                "qr_code": qr_code,
                 "attendee_name": attendee.name,
                 "attendee_email": attendee.email
             }

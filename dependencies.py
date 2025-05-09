@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 async def get_current_active_user(token: str = Depends(oauth2_scheme)):
-    logger.info("Verifying token from Authorization header")
+    logger.info("Verifying token from Authorization header for user")
     user = await verify_token(token)
+    print('user data:', user)
     if not user:
         logger.error("Invalid or expired token")
         raise HTTPException(
