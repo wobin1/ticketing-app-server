@@ -297,7 +297,7 @@ async def seed_database():
                 ]
                 for ticket in tickets:
                     cur.execute("""
-                        INSERT INTO tickets (id, event_id, user_id, ticket_type_id, purchase_date, status, qrCode, attendee_name, attendee_email)
+                        INSERT INTO tickets (id, event_id, user_id, ticket_type_id, purchase_date, status, qr_code, attendee_name, attendee_email)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ON CONFLICT (id) DO NOTHING
                     """, (
