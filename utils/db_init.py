@@ -1,4 +1,4 @@
-from app.repositories.db import Database
+from repositories.db import Database
 import logging
 
 logger = logging.getLogger(__name__)
