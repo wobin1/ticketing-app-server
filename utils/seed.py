@@ -81,7 +81,7 @@ async def seed_database():
                         "date": datetime(2025, 7, 12, 12, 0, 0),
                         "time": "12:00 PM",
                         "location": "Central Park, New York, NY",
-                        "image_url": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3",
+                        "image_url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&auto=format&fit=crop",
                         "ticket_types": [
                             {
                                 "id": "tt_001_1",
@@ -106,7 +106,7 @@ async def seed_database():
                         "date": datetime(2025, 9, 15, 9, 0, 0),
                         "time": "9:00 AM",
                         "location": "Moscone Center, San Francisco, CA",
-                        "image_url": "https://images.unsplash.com/photo-1540575467063-178a50c2df87",
+                        "image_url": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&auto=format&fit=crop",
                         "ticket_types": [
                             {
                                 "id": "tt_002_1",
@@ -131,7 +131,7 @@ async def seed_database():
                         "date": datetime(2025, 6, 20, 20, 0, 0),
                         "time": "8:00 PM",
                         "location": "The Laugh Factory, Chicago, IL",
-                        "image_url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819",
+                        "image_url": "https://images.unsplash.com/photo-1485095329183-d0797cdc5676?w=800&auto=format&fit=crop",
                         "ticket_types": [
                             {
                                 "id": "tt_003_1",
@@ -156,7 +156,7 @@ async def seed_database():
                         "date": datetime(2025, 8, 3, 11, 0, 0),
                         "time": "11:00 AM",
                         "location": "Napa Valley, CA",
-                        "image_url": "https://images.unsplash.com/photo-1515169067868-5387ec356754",
+                        "image_url": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&auto=format&fit=crop",
                         "ticket_types": [
                             {
                                 "id": "tt_004_1",
@@ -181,7 +181,7 @@ async def seed_database():
                         "date": datetime(2025, 10, 5, 7, 0, 0),
                         "time": "7:00 AM",
                         "location": "Boston, MA",
-                        "image_url": "https://images.unsplash.com/photo-1552673469-8a267f7b6e7e",
+                        "image_url": "https://images.unsplash.com/photo-1513593771513-7b58b6c4af38?w=800&auto=format&fit=crop",
                         "ticket_types": [
                             {
                                 "id": "tt_005_1",
