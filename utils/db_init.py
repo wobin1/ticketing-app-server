@@ -1,3 +1,4 @@
+# app/utils/db_init.py
 from repositories.db import Database
 import logging
 
@@ -46,6 +47,8 @@ async def create_tables():
         ticket_type_id VARCHAR(50) REFERENCES ticket_types(id) ON DELETE CASCADE,
         purchase_date TIMESTAMP NOT NULL,
         status VARCHAR(20) NOT NULL,
+        paystack_reference VARCHAR(50) UNIQUE,
+        payment_status VARCHAR(20) DEFAULT 'pending',
         qr_code TEXT,
         attendee_name VARCHAR(255),
         attendee_email VARCHAR(255)
@@ -65,8 +68,18 @@ async def create_tables():
                 existing_tables = cur.fetchone()[0]
                 
                 if existing_tables == 4:
-                    logger.info("All tables already exist, skipping creation")
-                    return
+                    # Check if paystack_reference and payment_status columns exist
+                    cur.execute("""
+                        SELECT column_name 
+                        FROM information_schema.columns 
+                        WHERE table_schema = 'public' 
+                        AND table_name = 'tickets' 
+                        AND column_name IN ('paystack_reference', 'payment_status')
+                    """)
+                    existing_columns = len(cur.fetchall())
+                    if existing_columns == 2:
+                        logger.info("All tables and columns already exist, skipping creation")
+                        return
 
                 # Execute table creation SQL
                 cur.execute(create_tables_sql)

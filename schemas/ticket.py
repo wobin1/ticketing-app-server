@@ -22,9 +22,11 @@ class Ticket(BaseModel):
     ticket_type_id: str
     purchase_date: datetime
     status: str
-    qr_code: str
-    attendee_name: str
-    attendee_email: EmailStr
+    payment_status: Optional[str] = "pending"
+    paystack_reference: Optional[str] = None
+    qr_code: Optional[str] = None
+    attendee_name: Optional[str] = None
+    attendee_email: Optional[str] = None
 
 class TicketVerification(BaseModel):
     valid: bool

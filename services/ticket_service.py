@@ -9,53 +9,58 @@ from services.email_service import send_ticket_email
 from services.auth_service import create_user
 import uuid
 from datetime import datetime, timezone  # Update import
+import logging
+
+logger = logging.getLogger(__name__)
 
 async def get_user_tickets(user_id: str) -> list[Ticket]:
-    tickets = await TicketRepository.get_tickets_by_user(user_id)
-    return [Ticket(**ticket) for ticket in tickets]
+    """
+    Fetch all tickets for a user.
+    """
+    try:
+        return await TicketRepository.get_user_tickets(user_id)
+    except Exception as e:
+        logger.error(f"Error fetching tickets for user {user_id}: {str(e)}")
+        raise
 
-async def purchase_tickets(purchase: TicketPurchase, current_user: User) -> list[Ticket]:
-    event = await EventRepository.get_event_by_id(purchase.event_id)
-    if not event:
-        raise HTTPException(status_code=404, detail="Event not found")
-    
-    tickets = []
-    for item in purchase.tickets:
-        ticket_type = next((tt for tt in event["ticket_types"] if tt["id"] == item.ticket_type_id), None)
+async def getPrice(ticket_type_id: str) -> float:
+    """
+    Fetch the price of a ticket type.
+    """
+    try:
+        ticket_type = await TicketRepository.get_ticket_type_by_id(ticket_type_id)
+        print('ticket type data', ticket_type)
         if not ticket_type:
-            raise HTTPException(status_code=400, detail=f"Invalid ticket type: {item.ticket_type_id}")
-        if ticket_type["available"] < item.quantity:
-            raise HTTPException(status_code=400, detail=f"Not enough tickets available for {ticket_type['name']}")
-        
-        for attendee in item.attendees:
-            ticket_id = str(uuid.uuid4())
-            qr_code = await generate_qr_code(ticket_id)
-            
-            ticket = {
-                "id": ticket_id,
-                "event_id": purchase.event_id,
-                "user_id": current_user.id,
-                "ticket_type_id": item.ticket_type_id,
-                "purchase_date": datetime.now(timezone.utc),
-                "status": "active",
-                "qr_code": qr_code,
-                "attendee_name": attendee.name,
-                "attendee_email": attendee.email
-            }
-            
-            await TicketRepository.create_ticket(ticket)
-            tickets.append(ticket)
-            await send_ticket_email(attendee.email, ticket)
-    
-    # Update ticket availability
-    for item in purchase.tickets:
-        await EventRepository.update_ticket_type_availability(
-            purchase.event_id,
-            item.ticket_type_id,
-            item.quantity
+            raise HTTPException(status_code=404, detail="Ticket type not found")
+        print('ticket price data', ticket_type)
+        return ticket_type['price']
+    except Exception as e:
+        logger.error(f"Error fetching ticket type {ticket_type_id}: {str(e)}")
+        raise
+
+async def purchase_ticket(purchase: TicketPurchase, user_id: str) -> Ticket:
+    """
+    Purchase a ticke§t for an event.
+    """
+    print('purchase data', purchase.tickets[0].attendees[0])
+    ticket_id = str(uuid.uuid4())
+    qr_code = await generate_qr_code(ticket_id)
+    ticket_price = await getPrice(purchase.tickets[0].ticket_type_id)  # Fetch price earlier
+    try:
+        ticket = await TicketRepository.purchase_ticket(
+            event_id=purchase.event_id,
+            user_id=user_id,
+            ticket_type_id=purchase.tickets[0].ticket_type_id ,
+            price=ticket_price,
+            attendee_name=purchase.tickets[0].attendees[0].name,
+            attendee_email=purchase.tickets[0].attendees[0].email,
+            qr_code=qr_code,
         )
-    
-    return [Ticket(**ticket) for ticket in tickets]
+        logger.info(f"Ticket purchased: {ticket.id} for user {user_id}")
+        return ticket
+    except Exception as e:
+        logger.error(f"Error purchasing ticket: {str(e)}")
+        raise
 
 async def verify_ticket(ticket_id: str) -> TicketVerification:
     ticket = await TicketRepository.get_ticket_by_id(ticket_id)
@@ -80,7 +85,7 @@ async def check_in_ticket(ticket_id: str) -> Ticket | None:
 
 async def get_all_tickets() -> list[Ticket]:
     tickets = await TicketRepository.get_all_tickets()
-    return [Ticket(**ticket) for ticket in tickets]
+    return tickets if isinstance(tickets[0], Ticket) else [Ticket(**ticket) for ticket in tickets]
 
 async def cancel_ticket(ticket_id: str) -> Ticket | None:
     ticket = await TicketRepository.get_ticket_by_id(ticket_id)
