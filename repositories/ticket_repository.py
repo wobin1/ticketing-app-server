@@ -121,6 +121,36 @@ class TicketRepository:
             logger.error(f"Error fetching user tickets: {str(e)}")
             raise   
 
+    @staticmethod
+    async def get_event_tickets(ticket_id: str) -> Ticket:
+        try:
+            with Database.get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT id, event_id, user_id, ticket_type_id, 
+                            purchase_date, status, payment_status, qr_code, 
+                            attendee_name, attendee_email
+                        FROM tickets 
+                        WHERE id = %s AND payment_status = 'completed'
+                    """, (ticket_id,))
+                    ticket = cur.fetchone()
+                    if ticket:
+                        return Ticket(
+                            id=ticket[0], 
+                            event_id=ticket[1], 
+                            user_id=ticket[2], 
+                            ticket_type_id=ticket[3],
+                            purchase_date=ticket[4], 
+                            status=ticket[5], 
+                            payment_status=ticket[6],
+                            qr_code=ticket[7], 
+                            attendee_name=ticket[8], 
+                            attendee_email=ticket[9]
+                        )
+                    return None
+        except Exception as e:
+            logger.error(f"Error fetching ticket: {str(e)}")
+
 
     @staticmethod
     async def get_ticket_type_by_id(ticket_type_id: str):

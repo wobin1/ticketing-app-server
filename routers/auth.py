@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from schemas.user import UserCreate, User, AuthResponse
-from services.auth_service import authenticate_user, create_user
+from services.auth_service import authenticate_user, create_user, get_guest_user
 from utils.security import create_access_token
 
 router = APIRouter()
@@ -19,3 +19,5 @@ async def register(user: UserCreate):
     created_user = await create_user(user)
     access_token = create_access_token({"sub": created_user.email, "role": created_user.role})
     return {"user": created_user, "token": access_token}
+
+

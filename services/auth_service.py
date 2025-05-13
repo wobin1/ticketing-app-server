@@ -47,3 +47,18 @@ async def create_user(user: UserCreate, is_guest: bool = False) -> User:
         is_guest=created_user["is_guest"],
         role=created_user["role"]
     )
+
+async def get_guest_user(email: str) -> User:
+    guest_user = await UserRepository.get_user_by_email(email)
+    if not guest_user:
+        raise HTTPException(status_code=404, detail="Guest user not found")
+    
+    return User(
+        id=guest_user["id"],
+        email=guest_user["email"],
+        first_name=guest_user["first_name"],
+        last_name=guest_user["last_name"],
+        role=guest_user["role"]
+    )
+
+

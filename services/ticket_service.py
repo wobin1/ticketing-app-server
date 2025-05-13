@@ -23,6 +23,23 @@ async def get_user_tickets(user_id: str) -> list[Ticket]:
         logger.error(f"Error fetching tickets for user {user_id}: {str(e)}")
         raise
 
+async def get_event_tickets(ticket_ids: str) -> list[Ticket]:
+    """
+    Fetch all tickets for an event.
+    """
+    try:
+        guest_tickets = []
+        for ticket_id in ticket_ids:
+            ticket = await TicketRepository.get_event_tickets(ticket_id['id'])
+            if not ticket:
+                logger.error(f"Completely paid Ticket not found for ID {ticket_id}")
+            else:
+                guest_tickets.append(ticket)
+        return guest_tickets
+    except Exception as e:
+        logger.error(f"Error fetching tickets for event {ticket_ids}: {str(e)}")
+        raise
+
 async def getPrice(ticket_type_id: str) -> float:
     """
     Fetch the price of a ticket type.

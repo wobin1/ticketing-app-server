@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from schemas.ticket import Ticket, TicketPurchase, TicketVerification
-from services.ticket_service import get_user_tickets, purchase_ticket, verify_ticket, get_all_tickets
+from services.ticket_service import get_user_tickets, purchase_ticket, verify_ticket, get_all_tickets, get_event_tickets
 from services.payment_service import PaystackService
 from dependencies import get_current_active_user, get_current_admin_user
 from repositories.ticket_repository import TicketRepository
@@ -18,6 +18,13 @@ async def list_user_tickets(current_user: User = Depends(get_current_active_user
     logger.info(f"Fetching tickets for user: {current_user.email} with ID: {current_user.id}")
     tickets = await get_user_tickets(current_user.id)
     logger.info(f"Found {len(tickets)} tickets for user {current_user.email}")
+    return tickets
+
+@router.post("/guest-tickets")
+async def list_event_tickets(ticket_ids: list[dict]):
+    logger.info(f"Fetching tickets for event with ID: {ticket_ids}")
+    tickets = await get_event_tickets(ticket_ids)
+    logger.info(f"Found {len(tickets)} tickets for event ID {ticket_ids}")
     return tickets
 
 @router.post("/purchase", response_model=dict)
@@ -40,7 +47,7 @@ async def purchase_ticket_endpoint(
             email=current_user.email,
             amount=purchase_amount["price"],  # Paystack expects amount in kobo
             ticket_id=ticket.id,
-            callback_url=callback_url
+            callback_url=callback_url,
         )
         
         # Update ticket with Paystack reference
